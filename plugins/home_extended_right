@@ -31,31 +31,32 @@
 #################################################################################
 #
     # Test        : CUS-0001
-    # Description : Extended right in /home (666) 
+    # Description : Files with o+r perms in /home
 
     # Just do check without any prerequisites
-    Register --test-no CUS-0001 --weight L --network NO --description "file 666 in /home"
+    Register --test-no CUS-0001 --weight L --network NO --description "Files with o+r perms in /home"
     if [ ${SKIPTEST} -eq 0 ]; then
         # Check if extended right 
-	EXTENDED_RIGHT_HOME=`find /home -type f -perm 666 |sed 's/ /!space!/g'`
+	EXTENDED_RIGHT_HOME=`find /home -type f -perm -o=r |sed 's/ /!space!/g'`
 	if  [ "${EXTENDED_RIGHT_HOME}" = "" ];then
-		Diplay --indent 2 --text "- Checking 666 right file in /home ..." --result OK --color GREEN	
+		Diplay --indent 2 --text "- Checking files with o+r perms in /home" --result OK --color GREEN	
                 logtext "Result: No files"
               else
-		Display --indent 2 --text "- Checking 666 right file in /home..." --result WARNING --color RED
+		Display --indent 2 --text "- Checking files with o+r perms in /home" --result WARNING --color RED
             N=0
             for I in ${EXTENDED_RIGHT_HOME}; do
                 FILE=`echo ${EXTENDED_RIGHT_HOME} | sed 's/!space!/ /g'`
-                logtext "Old temporary file: ${FILE}"
+                logtext "Files o+r perms in /home: ${FILE}"
                 N=`expr ${N} + 1`
             done
-            logtext "Result: found 666 files in /home, which were not modified in the last ${TMP_OLD_DAYS} days"
-            logtext "Advice: check and clean up unused files in /tmp. Old files can fill up a disk or contain"
+            logtext "Result: found files in /home with perms o+r"
+            logtext "Advice: check and clean up unused files in /. Old files can fill up a disk or contain"
+home
             logtext "private information and should be deleted it not being used actively. Use a tool like lsof to"
             logtext "see which programs possibly are using a particular file. Some systems can cleanup temporary"
             logtext "directories by setting a boot option."
-            ReportWarning ${TEST_NO} "L" "Found ${N} files in /home which are 666 right in /home"
-            ReportSuggestion ${TEST_NO} "Clean up unused files in /home"
+            ReportWarning ${TEST_NO} "L" "Found ${N} files in /home with o+r perms"
+            ReportSuggestion ${TEST_NO} "Clean up unused files or modify permissions  in /home"
 
         fi
     fi
