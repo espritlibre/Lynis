@@ -1,0 +1,102 @@
+#!/bin/sh
+# -------------------------- CUT THIS SECTION ---------------------------
+#  This is a template to create a personal plugin
+#
+#  Each plugin should at least have several variables defined with the
+#  prefix PLUGIN_* (see below)
+#
+#  To add a section header, use the InsertSection function (see below)
+#
+# -------------------------- CUT THIS SECTION ---------------------------
+
+#########################################################################
+#
+#    * DO NOT REMOVE *
+#-----------------------------------------------------
+# PLUGIN_AUTHOR=___julien_rouxel_<julien@esprit-libre.info>___
+# PLUGIN_CATEGORY=___scanfiles___
+# PLUGIN_DESC=___extended_right_home___
+# PLUGIN_NAME=home_extended_right
+# PLUGIN_REQUIRED_TESTS=
+#-----------------------------------------------------
+#########################################################################
+#
+#
+#
+#########################################################################
+#
+# Add custom section to screen output
+    InsertSection "Personal Plugin"
+#
+#################################################################################
+#
+    # Test        : CUS-0001
+    # Description : Extended right in /home (666) 
+
+    # Just do check without any prerequisites
+    Register --test-no CUS-0001 --weight L --network NO --description "file 666 in /home"
+    if [ ${SKIPTEST} -eq 0 ]; then
+        # Check if extended right 
+	EXTENDED_RIGHT_HOME=`find /home -type f -perm 666 |sed 's/ /!space!/g'`
+	if  [ "${EXTENDED_RIGHT_HOME}" = "" ];then
+		Diplay --indent 2 --text "- Checking 666 right file in /home ..." --result OK --color GREEN	
+                logtext "Result: No files"
+              else
+		Display --indent 2 --text "- Checking 666 right file in /home..." --result WARNING --color RED
+            N=0
+            for I in ${EXTENDED_RIGHT_HOME}; do
+                FILE=`echo ${EXTENDED_RIGHT_HOME} | sed 's/!space!/ /g'`
+                logtext "Old temporary file: ${FILE}"
+                N=`expr ${N} + 1`
+            done
+            logtext "Result: found 666 files in /home, which were not modified in the last ${TMP_OLD_DAYS} days"
+            logtext "Advice: check and clean up unused files in /tmp. Old files can fill up a disk or contain"
+            logtext "private information and should be deleted it not being used actively. Use a tool like lsof to"
+            logtext "see which programs possibly are using a particular file. Some systems can cleanup temporary"
+            logtext "directories by setting a boot option."
+            ReportWarning ${TEST_NO} "L" "Found ${N} files in /home which are 666 right in /home"
+            ReportSuggestion ${TEST_NO} "Clean up unused files in /home"
+
+        fi
+    fi
+#
+#################################################################################
+#
+    # Test        : CUS-0002
+    # Description : Extended right in /home (777) 
+
+    # Just do check without any prerequisites
+    Register --test-no CUS-0002 --weight L --network NO --description "folder 777 in /home"
+    if [ ${SKIPTEST} -eq 0 ]; then
+        # Check if extended right 
+	EXTENDED_RIGHT_HOME=`find /home -type d -perm 777 |sed 's/ /!space!/g'`
+	if  [ "${EXTENDED_RIGHT_HOME}" = "" ];then
+		Diplay --indent 2 --text "- Checking 777 right folder in /home ..." --result OK --color GREEN	
+                logtext "Result: No files"
+              else
+		Display --indent 2 --text "- Checking 777 right folder in /home..." --result WARNING --color RED
+            N=0
+            for I in ${EXTENDED_RIGHT_HOME}; do
+                FILE=`echo ${EXTENDED_RIGHT_HOME} | sed 's/!space!/ /g'`
+                logtext "Old temporary file: ${FILE}"
+                N=`expr ${N} + 1`
+            done
+            logtext "Result: found 777 in /home, which were not modified in the last ${TMP_OLD_DAYS} days"
+            logtext "Advice: check and clean up unused files in /tmp. Old files can fill up a disk or contain"
+            logtext "private information and should be deleted it not being used actively. Use a tool like lsof to"
+            logtext "see which programs possibly are using a particular file. Some systems can cleanup temporary"
+            logtext "directories by setting a boot option."
+            ReportWarning ${TEST_NO} "L" "Found ${N} files in /home which are 666 right in /home"
+            ReportSuggestion ${TEST_NO} "Clean up unused files in /home"
+
+        fi
+    fi
+#
+#################################################################################
+#
+
+
+# Wait for keypress (unless --quick is being used)
+wait_for_keypress
+
+#EOF

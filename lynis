@@ -12,6 +12,8 @@
 # welcome to redistribute it under the terms of the GNU General Public License.
 # See LICENSE file for usage of this software.
 #
+# Modification Jrouxel [ julien@esprit-libre.info ] 05/08/13
+## Suppression post et pre pour les plugins /  Activation des plugins
 #################################################################################
 #
 # Lynis is an automated auditing tool for Unix based operating systems.
@@ -499,7 +501,6 @@ REPORT_version="${REPORT_version_major}.${REPORT_version_minor}"
     
     # Search plugins
     logtext "Searching plugins..."
-    logtext "NOTE: Plugins aren't supported yet!"
     N_PLUGIN=0
     N_PLUGIN_ENABLED=0
     FIND=`find ${PLUGINDIR} -type f -name "[a-z]*" -exec echo \{\} \;`
@@ -513,21 +514,19 @@ REPORT_version="${REPORT_version_major}.${REPORT_version_minor}"
 		FIND3=`grep "^plugin=${FIND2}" ${PROFILE}`
 		if [ ! "${FIND3}" = "" ]; then
 		    logtext "Plugin ${FIND2} is enabled"
-		    # Plugins should have at least a _post part, _pre is optional (future)
-		    PLUGINFILE="${PLUGINDIR}/plugin_${FIND2}_post"
-		    if [ -f ${PLUGINFILE} ]; then
-		        FIND4=`ls -l ${PLUGINFILE} | cut -c 2-10`
+		    if [ -f ${PLUGINDIR}/${FIND2} ]; then
+		        FIND4=`ls -l ${PLUGINDIR}/${FIND2} | cut -c 2-10`
 			if [ "${FIND4}" = "rw-r-----" -o "${FIND4}" = "rw-------" -o "${FIND4}" = "r--------" ]; then
-			    logtext "Including plugin file: ${PLUGINFILE}"
+			    logtext "Including plugin file: ${FIND2}"
 			    report "used_plugin[]=${FIND2}"
 			    logtext "PLUGIN EXECUTION SKIPPED, STILL EXPERIMENTAL"
-			    # . ${PLUGINFILE}
+			    . ${I}
 			    N_PLUGIN_ENABLED=`expr ${N_PLUGIN_ENABLED} + 1`
 			  else
 			    logtext "Plugin ${FIND2}: Skipped (bad file permissions, should be 640, 600 or 400)"
 			fi
 		      else
-		        logtext "Plugin ${FIND2}: Skipped (can't find file ${PLUGINFILE})"
+		        logtext "Plugin ${FIND2}: Skipped (can't find file ${FIND3})"
 		    fi
 		  else
 		    logtext "Plugin ${FIND2}: Skipped (not enabled)"
